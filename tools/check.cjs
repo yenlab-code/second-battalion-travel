@@ -29,5 +29,7 @@ assert.equal(context.roundTripTotals(['-1'],['20']).invalid,true);
 assert.ok(!html.includes('id="fares"'));
 assert.ok(html.includes('臺鐵票價 ↗')&&html.includes('北捷票價 ↗'));
 assert.ok(html.includes('同車共乘：里程費只由駕駛申報')&&html.includes('其他同車人員視為搭便車'));
+assert.equal((html.match(/class="case-choice/g)||[]).length,3);
+assert.ok(html.includes('送件前 5 項確認')&&html.includes('max="5"'));
 assert.equal((html.match(/"example":/g)||[]).length,29);
-console.log('PASS: JavaScript syntax + 23 calculation/content checks');
+console.log('PASS: JavaScript syntax + 25 calculation/content checks');
