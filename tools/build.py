@@ -1,5 +1,5 @@
 from pathlib import Path
-import json, csv, re, shutil
+import json, re, shutil
 from pypdf import PdfReader
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -110,9 +110,7 @@ for item in cards:
     item['example'] = examples[item['title']]
 
 pages=[dict(page=i+1,text=p.extract_text()) for i,p in enumerate(PdfReader(ROOT/'sources/compendium-11503.pdf').pages)]
-rows=list(csv.reader((ROOT/'tools/taipei-metro-1150830.csv').read_text(encoding='cp950').splitlines()))
-metro=[[r[0],r[1],float(r[2]),float(r[3]),r[4]] for r in rows[1:] if len(r)>=5]
-data=dict(cards=cards,pages=pages,metro=metro,internal='\n'.join(p.extract_text() for p in PdfReader(ROOT/'sources/internal-114.pdf').pages))
+data=dict(cards=cards,pages=pages,internal='\n'.join(p.extract_text() for p in PdfReader(ROOT/'sources/internal-114.pdf').pages))
 template=(ROOT/'tools/template.html').read_text(encoding='utf-8')
 (ROOT/'index.html').write_text(template.replace('/*DATA*/', 'const DATA='+json.dumps(data,ensure_ascii=False).replace('</','<\\/')+';'),encoding='utf-8')
-print('Built',len(cards),'cards,',len(pages),'pages,',len(metro),'metro pairs')
+print('Built',len(cards),'cards and',len(pages),'pages')
