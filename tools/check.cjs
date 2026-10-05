@@ -46,7 +46,7 @@ assert.ok(html.includes("caseType==='special'&&type==='臺鐵'"));
 assert.ok(html.includes("t==='other'")&&html.includes('一般試算已停用'));
 assert.ok(html.includes("groupMarkup('常用規定',common,true)"));
 assert.ok(html.includes('@media(max-width:760px)')&&html.includes('.leg-table td::before'));
-assert.ok(html.includes('class="pet-heart"')&&html.includes('抱著文件一起工作的可愛小狗和小貓'));
+assert.ok(html.includes('class="pet-heart"')&&html.includes('抱著文件一起工作的可愛馬爾濟斯和小貓')&&html.includes('class="maltese-head"')&&html.includes('class="maltese-body"'));
 assert.ok(!html.includes('sources/internal-114.pdf')&&!html.includes('sources/compendium-11503.pdf'));
 assert.ok(!html.includes('"pages":')&&!html.includes('"internal":'));
 assert.ok(html.includes('臺鐵票價 ↗')&&html.includes('北捷票價 ↗'));
