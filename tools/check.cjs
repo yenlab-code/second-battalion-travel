@@ -52,4 +52,4 @@ assert.ok(!html.includes('"pages":')&&!html.includes('"internal":'));
 assert.ok(html.includes('臺鐵票價 ↗')&&html.includes('北捷票價 ↗'));
 assert.ok(html.includes('同一車輛只由駕駛申報'));
 assert.equal((html.match(/"example":/g)||[]).length,29);
-console.log('PASS: JavaScript syntax + 48 calculation/content/privacy/responsive checks');
+console.log('PASS: JavaScript syntax + calculation/content/privacy/responsive checks');
