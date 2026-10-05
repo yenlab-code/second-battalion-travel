@@ -1,6 +1,7 @@
 from pathlib import Path
-import json, re, shutil
-from pypdf import PdfReader
+import json
+import os
+import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 WORK=ROOT.parent
@@ -109,8 +110,13 @@ for item in cards:
     item['body'] = plain[item['title']]
     item['example'] = examples[item['title']]
 
-pages=[dict(page=i+1,text=p.extract_text()) for i,p in enumerate(PdfReader(ROOT/'sources/compendium-11503.pdf').pages)]
-data=dict(cards=cards,pages=pages,internal='\n'.join(p.extract_text() for p in PdfReader(ROOT/'sources/internal-114.pdf').pages))
+# 公開版本只嵌入整理後的規定卡片，不嵌入保六內規或解釋彙編全文。
+# 原始 PDF 留在內部共用資料夾，避免公開網站把內部文件全文一併發布。
+data=dict(cards=cards)
 template=(ROOT/'tools/template.html').read_text(encoding='utf-8')
-(ROOT/'index.html').write_text(template.replace('/*DATA*/', 'const DATA='+json.dumps(data,ensure_ascii=False).replace('</','<\\/')+';'),encoding='utf-8')
-print('Built',len(cards),'cards and',len(pages),'pages')
+output=template.replace('/*DATA*/', 'const DATA='+json.dumps(data,ensure_ascii=False).replace('</','<\\/')+';')
+if os.environ.get('BUILD_STDOUT') == '1':
+    sys.stdout.write(output)
+else:
+    (ROOT/'index.html').write_text(output,encoding='utf-8')
+    print('Built',len(cards),'cards')
