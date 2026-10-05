@@ -1,0 +1,62 @@
+const assert=require('assert');
+const {pathToFileURL}=require('url');
+const path=require('path');
+const {chromium}=require('playwright');
+(async()=>{
+  const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'});
+  const page=await browser.newPage({viewport:{width:1280,height:900}});
+  const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+  await page.goto(pathToFileURL(path.join(__dirname,'../index.html')).href);
+  await page.waitForLoadState('domcontentloaded');
+  assert.equal(await page.locator('#basic-step').isVisible(),true);
+  assert.equal(await page.locator('#summary-step').isVisible(),true);
+  assert.equal(await page.getByText('下一步：試算交通費',{exact:true}).count(),0);
+  const desktopLegDisplay=await page.locator('#outbound-legs tr').first().evaluate(e=>getComputedStyle(e).display);
+  assert.equal(desktopLegDisplay,'grid');
+  const desktopOverflow=await page.locator('#outbound-legs').locator('xpath=ancestor::div[contains(@class,"tablewrap")]').evaluate(e=>({client:e.clientWidth,scroll:e.scrollWidth}));
+  assert.equal(desktopOverflow.scroll<=desktopOverflow.client+1,true);
+
+  await page.locator('[data-case="special"]').click();
+  const out=page.locator('#outbound-legs tr').first(),back=page.locator('#return-legs tr').first();
+  await out.locator('select').first().selectOption({label:'公車'});await out.locator('input').nth(2).fill('20');
+  await back.locator('select').first().selectOption({label:'臺鐵'});await back.locator('input').nth(2).fill('100');
+  assert.match(await out.locator('.eligibility').innerText(),/待認定/);
+  assert.match(await back.locator('.eligibility').innerText(),/列入/);
+  assert.match(await page.locator('#fare-total').innerText(),/NT\$ 100/);
+  assert.match(await page.locator('#fare-total').innerText(),/NT\$ 20/);
+
+  await page.locator('#driver-confirm').check();await page.locator('#km-out').fill('120');await page.locator('#km-return').fill('121');
+  assert.match(await page.locator('#mileage-result').innerText(),/待認定/);
+  const day=page.locator('.day-entry').first();
+  await day.locator('.day-distance').fill('100');await day.locator('.day-hours').fill('8');await day.locator('.day-lodging').selectOption('paid');await day.locator('.day-hotel').fill('3200');
+  assert.match(await day.locator('.day-result').innerText(),/待核准/);
+  await day.locator('.day-approved').selectOption('yes');await day.locator('.day-proof').selectOption('yes');
+  assert.match(await day.locator('.day-result').innerText(),/住宿 NT\$ 3,000/);
+  assert.match(await day.locator('.day-result').innerText(),/雜費 NT\$ 0/);
+  assert.match(await page.locator('#case-summary').innerText(),/合計：NT\$ 3,100/);
+
+  await page.locator('[data-case="other"]').click();
+  assert.equal(await page.locator('#transport-step').getAttribute('class').then(x=>x.includes('is-locked')),true);
+  assert.equal(await page.locator('#route-choice').isDisabled(),true);
+  assert.match(await page.locator('#case-summary').innerText(),/合計：NT\$ 0/);
+
+  await page.locator('[data-tab="review"]').click();
+  assert.equal(await page.getByText('只顯示需權責認定',{exact:true}).isVisible(),true);
+  assert.match(await page.locator('.filter-help').innerText(),/勾選後，只保留/);
+  assert.equal(await page.locator('.rule-group').count()>=2,true);
+  assert.match(await page.locator('#card-count').innerText(),/29/);
+  await page.locator('#search').fill('自駕');
+  assert.equal(await page.locator('.rule-group[open]').count(),1);
+  assert.equal(await page.locator('.rule-card[open]').count()>0,true);
+
+  await page.setViewportSize({width:280,height:844});
+  await page.locator('[data-tab="guide"]').click();
+  await page.locator('[data-case="general"]').click();
+  const display=await page.locator('#outbound-legs td').first().evaluate(e=>getComputedStyle(e).display);
+  assert.equal(display,'grid');
+  const mobileOverflow=await page.locator('#outbound-legs').locator('xpath=ancestor::div[contains(@class,"tablewrap")]').evaluate(e=>({client:e.clientWidth,scroll:e.scrollWidth}));
+  assert.equal(mobileOverflow.scroll<=mobileOverflow.client+1,true);
+  assert.deepEqual(errors,[]);
+  await browser.close();
+  console.log('PASS: desktop flows, case restrictions, multi-day rules, summary, quick rules, and mobile cards');
+})().catch(e=>{console.error(e);process.exit(1)});
