@@ -37,6 +37,15 @@ const {chromium}=require('playwright');
   assert.match(await day.locator('.day-result').innerText(),/住宿 NT\$ 3,000/);
   assert.match(await day.locator('.day-result').innerText(),/雜費 NT\$ 0/);
   assert.match(await page.locator('#case-summary').innerText(),/合計：NT\$ 3,100/);
+  await page.evaluate(()=>{syncPrintSheet();document.body.classList.add('print-summary');document.getElementById('print-sheet').setAttribute('aria-hidden','false')});
+  await page.emulateMedia({media:'print'});
+  assert.equal(await page.locator('#print-sheet').isVisible(),true);
+  assert.match(await page.locator('#print-sheet').innerText(),/二大差旅費｜本案初核摘要/);
+  assert.match(await page.locator('#print-sheet').innerText(),/合計：NT\$ 3,100/);
+  assert.equal(await page.locator('#guide').isVisible(),false);
+  const printBox=await page.locator('#print-sheet').evaluate(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height}));
+  assert.equal(printBox.width>300&&printBox.height>200,true);
+  await page.emulateMedia({media:'screen'});await page.evaluate(()=>closePrintSummary());
 
   await page.locator('[data-case="other"]').click();
   assert.equal(await page.locator('#transport-step').getAttribute('class').then(x=>x.includes('is-locked')),true);

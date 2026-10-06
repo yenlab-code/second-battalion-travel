@@ -39,6 +39,8 @@ assert.ok(html.indexOf('第一步：先分案型')<html.indexOf('第二步：交
 assert.ok(html.indexOf('第二步：交通費試算')<html.indexOf('第三步：逐日試算住宿與雜費'));
 assert.ok(html.includes('id="add-day"')&&html.includes('function addDay('));
 assert.ok(html.includes('id="case-summary"')&&html.includes('function evidenceGaps('));
+assert.ok(html.includes('id="print-sheet"')&&html.includes('function syncPrintSheet(')&&html.includes('function closePrintSummary('));
+assert.ok(!html.includes("setTimeout(()=>document.body.classList.remove('print-summary'),300)"));
 assert.ok(html.includes('class="leg-table"')&&html.includes('data-label="列計狀態"'));
 assert.ok(html.includes('grid-template-areas:"tool route reference paid remove"'));
 assert.ok(html.includes('逐段勾選「已核對」')&&html.includes('不代表路線或費用已核准'));
