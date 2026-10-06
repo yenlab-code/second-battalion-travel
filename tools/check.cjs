@@ -25,7 +25,11 @@ assert.ok(calc({date:'2024-12-31'}).blocked);
 assert.ok(calc({type:'other'}).blocked);
 assert.equal(context.isLegEligible('公車','general'),true);
 assert.equal(context.isLegEligible('臺鐵','special'),true);
-assert.equal(context.isLegEligible('捷運','special'),false);
+assert.equal(context.isLegEligible('公車','special'),true);
+assert.equal(context.isLegEligible('捷運','special'),true);
+assert.equal(context.isLegEligible('高鐵','special'),false);
+assert.equal(context.isLegEligible('計程車','special'),false);
+assert.equal(context.isLegEligible('其他','special'),false);
 assert.equal(context.isLegEligible('臺鐵','other'),false);
 
 const removed=['依審核順序往下填寫','試算結果是承辦工作底稿','一條路徑完成案件初核','審查提醒集中在這裡','六步審查流程','送件前 5 項確認','115年3月彙編全文搜尋','本版仍需主計確認','下一步：試算交通費'];
@@ -45,7 +49,10 @@ assert.ok(html.includes('class="leg-table"')&&html.includes('data-label="列計�
 assert.ok(html.includes('grid-template-areas:"tool route reference paid remove"'));
 assert.ok(html.includes('逐段勾選「已核對」')&&html.includes('不代表路線或費用已核准'));
 assert.ok(html.includes('<span>已核對</span>')&&html.includes('grid-template-columns:18px minmax(0,1fr)'));
-assert.ok(html.includes("caseType==='special'&&type==='臺鐵'"));
+assert.ok(html.includes("caseType==='special'&&['公車','捷運','臺鐵'].includes(type)"));
+assert.ok(html.includes('承辦人115.10.06洽總隊主計室確認'));
+assert.ok(!html.includes('特定活動只有臺鐵路段'));
+assert.ok(!html.includes('保六第3點：只補助火車票價'));
 assert.ok(html.includes("t==='other'")&&html.includes('一般試算已停用'));
 assert.ok(html.includes("groupMarkup('常用規定',common,true)"));
 assert.ok(html.includes('@media(max-width:760px)')&&html.includes('.leg-table td::before'));
