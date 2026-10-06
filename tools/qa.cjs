@@ -18,6 +18,10 @@ const {chromium}=require('playwright');
   assert.equal(verifyLayout.labelRight<=verifyLayout.statusLeft+0.5,true);
   const desktopOverflow=await page.locator('#outbound-legs').locator('xpath=ancestor::div[contains(@class,"tablewrap")]').evaluate(e=>({client:e.clientWidth,scroll:e.scrollWidth}));
   assert.equal(desktopOverflow.scroll<=desktopOverflow.client+1,true);
+  assert.equal(await page.locator('#route-choice option').nth(1).innerText(),'第二大隊 ⇄ 立法院民主議政園區(臺灣省議會紀念園區)');
+  await page.locator('#route-choice').selectOption('r1');
+  assert.equal(await page.locator('#destination').inputValue(),'臺中市霧峰區中正路734號 立法院民主議政園區(臺灣省議會紀念園區)');
+  assert.match(await page.locator('#outbound-legs tr').last().locator('input').first().getAttribute('value'),/民主議政園區/);
 
   await page.locator('[data-case="special"]').click();
   const out=page.locator('#outbound-legs tr').first(),back=page.locator('#return-legs tr').first();

@@ -54,5 +54,6 @@ assert.ok(!html.includes('sources/internal-114.pdf')&&!html.includes('sources/co
 assert.ok(!html.includes('"pages":')&&!html.includes('"internal":'));
 assert.ok(html.includes('臺鐵票價 ↗')&&html.includes('北捷票價 ↗'));
 assert.ok(html.includes('同一車輛只由駕駛申報'));
+assert.ok(html.includes('立法院民主議政園區(臺灣省議會紀念園區)')&&!html.includes('立法院中部辦公室'));
 assert.equal((html.match(/"example":/g)||[]).length,29);
 console.log('PASS: JavaScript syntax + calculation/content/privacy/responsive checks');
