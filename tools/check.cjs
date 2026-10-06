@@ -42,6 +42,7 @@ assert.ok(html.includes('id="case-summary"')&&html.includes('function evidenceGa
 assert.ok(html.includes('class="leg-table"')&&html.includes('data-label="列計狀態"'));
 assert.ok(html.includes('grid-template-areas:"tool route reference paid remove"'));
 assert.ok(html.includes('逐段勾選「已核對」')&&html.includes('不代表路線或費用已核准'));
+assert.ok(html.includes('<span>已核對</span>')&&html.includes('grid-template-columns:18px minmax(0,1fr)'));
 assert.ok(html.includes("caseType==='special'&&type==='臺鐵'"));
 assert.ok(html.includes("t==='other'")&&html.includes('一般試算已停用'));
 assert.ok(html.includes("groupMarkup('常用規定',common,true)"));

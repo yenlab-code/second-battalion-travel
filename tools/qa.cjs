@@ -13,6 +13,9 @@ const {chromium}=require('playwright');
   assert.equal(await page.getByText('下一步：試算交通費',{exact:true}).count(),0);
   const desktopLegDisplay=await page.locator('#outbound-legs tr').first().evaluate(e=>getComputedStyle(e).display);
   assert.equal(desktopLegDisplay,'grid');
+  const verifyLayout=await page.locator('#outbound-legs tr').first().evaluate(row=>{const label=row.querySelector('.verify-cell label').getBoundingClientRect(),text=row.querySelector('.verify-cell span').getBoundingClientRect(),status=row.querySelector('.eligibility').getBoundingClientRect();return{labelRight:label.right,textRight:text.right,statusLeft:status.left}});
+  assert.equal(verifyLayout.textRight<=verifyLayout.labelRight+0.5,true);
+  assert.equal(verifyLayout.labelRight<=verifyLayout.statusLeft+0.5,true);
   const desktopOverflow=await page.locator('#outbound-legs').locator('xpath=ancestor::div[contains(@class,"tablewrap")]').evaluate(e=>({client:e.clientWidth,scroll:e.scrollWidth}));
   assert.equal(desktopOverflow.scroll<=desktopOverflow.client+1,true);
 
